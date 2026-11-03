@@ -1,222 +1,1074 @@
 <!DOCTYPE html>
-<html lang="fi">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Esimerkkisivusto</title>
+    <title>Apex - Personal Productivity Dashboard</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                     },
+                    colors: {
+                        dark: {
+                            950: '#030712',
+                            900: '#090D16',
+                            800: '#0F172A',
+                            700: '#1E293B',
+                            600: '#334155',
+                        },
+                        brand: {
+                            indigo: '#6366F1',
+                            emerald: '#10B981',
+                            cyan: '#06B6D4',
+                            purple: '#8B5CF6'
+                        }
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 3s infinite alternate',
+                        'float': 'float 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%': { boxShadow: '0 0 15px -3px rgba(99, 102, 241, 0.2)' },
+                            '100%': { boxShadow: '0 0 25px 2px rgba(16, 185, 129, 0.4)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-6px)' },
+                        }
+                    }
                 }
             }
         }
     </script>
     <style>
-        /* Pehmeä skrollaus */
-        html {
-            scroll-behavior: smooth;
+        /* Modern theme styles & glow effects */
+        body {
+            background-color: #07090E;
+            color: #F8FAFC;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        /* Subtiili taustakuvio */
-        .bg-grid {
-            background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-            background-size: 24px 24px;
+
+        /* Light Mode Overrides */
+        html:not(.dark) body {
+            background-color: #F8FAFC;
+            color: #0F172A;
         }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        html:not(.dark) .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Border Glow Hover Effects */
+        .glass-panel:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 0 20px -3px rgba(99, 102, 241, 0.25);
+        }
+
+        /* Premium Micro-Interactions */
+        .btn-hover-lift {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-hover-lift:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.35);
+        }
+        .btn-hover-lift:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Task Fade Out Animation */
+        .task-fade-out {
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Subtle scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.8);
+        }
+
+        /* Staggered Entrance Animations */
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-1 { animation-delay: 0.05s; }
+        .delay-2 { animation-delay: 0.12s; }
+        .delay-3 { animation-delay: 0.2s; }
+        .delay-4 { animation-delay: 0.28s; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between">
+<body class="min-h-screen flex selection:bg-brand-indigo selection:text-white">
 
-    <!-- Keltainen Huomautusbanneri -->
-    <div class="bg-amber-400 text-slate-950 font-bold px-4 py-2 text-center text-sm shadow-md sticky top-0 z-50 flex items-center justify-center gap-2 tracking-wide">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        <span>HUOMIO: Tämä on vain esimerkkisivusto</span>
-    </div>
+    <!-- Background Dynamic Ambient Lights -->
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-brand-indigo/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-glow"></div>
+    <div class="fixed bottom-10 right-1/4 w-96 h-96 bg-brand-emerald/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
-    <!-- Yläpalkki / Navigaatio -->
-    <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-xl sticky top-9 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-orange-500/20 font-black text-white text-xl">
-                    E
-                </div>
-                <div>
-                    <span class="font-bold text-xl tracking-tight text-white block leading-none">Esimerkki Oy</span>
-                    <span class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Demo Enterprise</span>
+    <!-- LEFT SIDEBAR -->
+    <aside id="sidebar" class="w-64 glass-panel border-r border-slate-800/80 dark:border-slate-800/80 flex flex-col justify-between h-screen sticky top-0 transition-all duration-300 z-30">
+        <div>
+            <!-- Workspace Logo / Header -->
+            <div class="p-5 flex items-center justify-between border-b border-slate-800/60 dark:border-slate-800/60">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-indigo to-brand-emerald flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
+                        <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-sm tracking-wide text-slate-100 dark:text-slate-100 flex items-center gap-1.5">
+                            APEX <span class="text-[10px] bg-brand-indigo/20 text-brand-indigo px-1.5 py-0.5 rounded font-mono font-medium">DEMO</span>
+                        </h1>
+                        <p class="text-[11px] text-slate-400">Personal Workspace</p>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Ainoat toimivat napit sivulla -->
-            <nav class="flex space-x-6 sm:space-x-10 text-sm font-semibold text-slate-300">
-                <a href="#alku" class="hover:text-amber-400 transition-colors py-2 border-b-2 border-transparent hover:border-amber-400">Etusivu</a>
-                <a href="#palvelut" class="hover:text-amber-400 transition-colors py-2 border-b-2 border-transparent hover:border-amber-400">Palvelut</a>
-                <a href="#tilastot" class="hover:text-amber-400 transition-colors py-2 border-b-2 border-transparent hover:border-amber-400">Esimerkkiluvut</a>
-                <a href="#tiimi" class="hover:text-amber-400 transition-colors py-2 border-b-2 border-transparent hover:border-amber-400">Tiimi</a>
+
+            <!-- Command Bar Trigger Button -->
+            <div class="px-3 py-3">
+                <button onclick="toggleQuickCommand()" class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-slate-900/60 dark:bg-slate-900/60 border border-slate-800 hover:border-slate-700 text-slate-400 text-xs transition">
+                    <span class="flex items-center gap-2">
+                        <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                        <span>Search commands...</span>
+                    </span>
+                    <kbd class="px-1.5 py-0.5 text-[10px] bg-slate-800 rounded border border-slate-700 text-slate-400">⌘K</kbd>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="px-3 space-y-1 mt-2">
+                <a href="#overview" onclick="setActiveNav(this, 'overview-view')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-brand-indigo bg-brand-indigo/15 border border-brand-indigo/30 transition-all duration-150">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#focus" onclick="setActiveNav(this, 'focus-view')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition-all duration-150">
+                    <i data-lucide="timer" class="w-4 h-4"></i>
+                    <span>Focus Timer</span>
+                    <span id="focus-badge" class="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">25m</span>
+                </a>
+                <a href="#tasks" onclick="setActiveNav(this, 'tasks-view')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition-all duration-150">
+                    <i data-lucide="check-square" class="w-4 h-4"></i>
+                    <span>Quick Tasks</span>
+                    <span id="pending-count" class="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-brand-indigo/20 text-brand-indigo font-bold">3</span>
+                </a>
+                <a href="#analytics" onclick="setActiveNav(this, 'analytics-view')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition-all duration-150">
+                    <i data-lucide="line-chart" class="w-4 h-4"></i>
+                    <span>Analytics</span>
+                </a>
             </nav>
         </div>
-    </header>
 
-    <!-- Pääsisältö -->
-    <main class="flex-grow bg-grid">
-        <!-- Hero-osio -->
-        <section id="alku" class="relative py-28 px-4 text-center max-w-5xl mx-auto overflow-hidden">
-            <!-- Taustavalot -->
-            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
-            <div class="absolute top-1/3 left-1/3 w-80 h-80 bg-amber-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+        <!-- User Profile & Light/Dark Theme Switcher Footer -->
+        <div class="p-3 border-t border-slate-800/60 dark:border-slate-800/60 space-y-2">
+            <!-- Theme Switcher Button -->
+            <button onclick="toggleTheme()" class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-slate-900/60 hover:bg-slate-800/60 border border-slate-800/80 text-xs text-slate-300 transition">
+                <span class="flex items-center gap-2">
+                    <i id="theme-icon" data-lucide="moon" class="w-3.5 h-3.5 text-brand-indigo"></i>
+                    <span id="theme-text">Dark Mode</span>
+                </span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">Toggle</span>
+            </button>
 
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-300 text-xs font-medium mb-8">
-                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                Yrityksen mallipohja & Visualisointi
+            <!-- User Info Card -->
+            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-800/40 transition">
+                <div class="flex items-center gap-2.5">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover border border-slate-700">
+                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-brand-emerald rounded-full border-2 border-slate-900"></span>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-slate-200">Alex Vance</p>
+                        <p class="text-[10px] text-slate-400">Product Architect</p>
+                    </div>
+                </div>
+                <button onclick="toggleQuickCommand()" class="text-slate-500 hover:text-slate-300 transition">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT VIEW AREA -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        <!-- TOP HEADER BAR -->
+        <header class="h-16 border-b border-slate-800/60 px-8 flex items-center justify-between sticky top-0 glass-panel z-20">
+            <div class="flex items-center gap-4">
+                <span class="text-xs text-slate-400 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-brand-emerald animate-ping"></span>
+                    Interactive Demo Mode
+                </span>
+                <span class="text-slate-700">/</span>
+                <span id="current-date" class="text-xs font-medium text-slate-300">Tuesday, Nov 3, 2026</span>
             </div>
 
-            <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight text-white mb-8 leading-tight">
-                Luotettava kumppani <br class="hidden sm:inline" />
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-indigo-400">esimerkinomaisiin tarpeisiin</span>
-            </h1>
+            <!-- Header Quick Actions -->
+            <div class="flex items-center gap-3">
+                <button onclick="openAddTaskModal()" class="btn-hover-lift flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-indigo hover:bg-indigo-600 text-white text-xs font-medium shadow-md shadow-indigo-500/20">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>New Task</span>
+                </button>
+                <div class="h-4 w-px bg-slate-800"></div>
+                <button onclick="toggleQuickCommand()" class="p-2 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-800/60 relative transition">
+                    <i data-lucide="bell" class="w-4 h-4"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-indigo rounded-full"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Body -->
+        <div class="p-8 max-w-7xl mx-auto w-full space-y-8">
             
-            <p class="text-lg sm:text-xl text-slate-400 mb-10 max-w-2xl mx-auto font-normal leading-relaxed">
-                Tämä on moderni yrityssivuston malli. Voit selata eri osioita käyttämällä yläpalkissa olevia navigaatiolinkkejä.
-            </p>
-
-            <div class="flex flex-wrap gap-4 justify-center items-center opacity-60">
-                <span class="px-8 py-3.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 font-semibold cursor-not-allowed">
-                    Ei-toimiva painike
-                </span>
-                <span class="px-8 py-3.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 font-semibold cursor-not-allowed">
-                    Esimerkkitoiminto
-                </span>
-            </div>
-        </section>
-
-        <!-- Palvelut-osio -->
-        <section id="palvelut" class="py-24 bg-slate-900/50 border-y border-slate-800/80">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Esimerkkipalvelumme</h2>
-                    <p class="text-slate-400 max-w-xl mx-auto">Minkälaisia ratkaisuja kuvitteellinen yrityksemme voisi tarjota.</p>
-                </div>
-
-                <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Kortti 1 -->
-                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl relative overflow-hidden group">
-                        <div class="w-14 h-14 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center mb-6 text-2xl font-bold border border-amber-500/20">
-                            💼
+            <!-- VIEW 1: OVERVIEW -->
+            <div id="overview-view" class="view-section space-y-8">
+                <!-- Hero Greeting Banner -->
+                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden animate-fade-in-up delay-1 border border-slate-800">
+                    <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-gradient-to-br from-brand-indigo/20 to-brand-emerald/20 rounded-full blur-2xl"></div>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h2 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                                    Good morning, Alex <span class="text-xl">✨</span>
+                                </h2>
+                                <span class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">Demo & Example</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1">You have <span class="text-slate-200 font-semibold">4 key milestones</span> scheduled today. Peak productivity predicted at 10:00 AM.</p>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-3">Strategiakonsultointi</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">
-                            Autamme luomaan selkeitä visioita ja suunnittelemaan tulevaisuuden kasvua tehokkaasti.
-                        </p>
-                    </div>
-
-                    <!-- Kortti 2 -->
-                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl relative overflow-hidden group">
-                        <div class="w-14 h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mb-6 text-2xl font-bold border border-indigo-500/20">
-                            ⚡
+                        <div class="flex items-center gap-3">
+                            <div class="glass-panel px-4 py-2 rounded-xl text-center">
+                                <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Daily Streak</p>
+                                <p class="text-lg font-bold text-brand-emerald flex items-center justify-center gap-1">
+                                    <i data-lucide="flame" class="w-4 h-4 text-brand-emerald"></i> 14 Days
+                                </p>
+                            </div>
+                            <div class="glass-panel px-4 py-2 rounded-xl text-center">
+                                <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Focus Score</p>
+                                <p class="text-lg font-bold text-brand-indigo">94%</p>
+                            </div>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-3">Digitaalinen Kehitys</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">
-                            Modernit verkkoratkaisut ja sovellukset nopealla ja luotettavalla suorituskyvyllä.
-                        </p>
                     </div>
+                </div>
 
-                    <!-- Kortti 3 -->
-                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl relative overflow-hidden group">
-                        <div class="w-14 h-14 bg-purple-500/10 text-purple-400 rounded-2xl flex items-center justify-center mb-6 text-2xl font-bold border border-purple-500/20">
-                            🛡️
+                <!-- Sleek Metric Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 animate-fade-in-up delay-2">
+                    <!-- Metric Card 1 -->
+                    <div class="glass-panel p-5 rounded-xl space-y-3 relative group transition hover:-translate-y-1">
+                        <div class="flex items-center justify-between text-slate-400">
+                            <span class="text-xs font-medium">Deep Work Hours</span>
+                            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-brand-indigo">
+                                <i data-lucide="clock" class="w-4 h-4"></i>
+                            </div>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-3">Laatutakuu & Tuki</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">
-                            Jatkuva valvonta ja tuki varmistavat järjestelmien moitteettoman toiminnan aina.
-                        </p>
+                        <div class="flex items-baseline justify-between">
+                            <span class="text-2xl font-bold text-white">5.4 <span class="text-xs font-normal text-slate-400">hrs</span></span>
+                            <span class="text-xs text-brand-emerald flex items-center font-medium">
+                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 mr-0.5"></i> +12%
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-brand-indigo h-full rounded-full" style="width: 75%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Metric Card 2 -->
+                    <div class="glass-panel p-5 rounded-xl space-y-3 relative group transition hover:-translate-y-1">
+                        <div class="flex items-center justify-between text-slate-400">
+                            <span class="text-xs font-medium">Tasks Completed</span>
+                            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-brand-emerald">
+                                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline justify-between">
+                            <span class="text-2xl font-bold text-white">18 / 22</span>
+                            <span class="text-xs text-brand-emerald flex items-center font-medium">
+                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 mr-0.5"></i> 82%
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-brand-emerald h-full rounded-full" style="width: 82%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Metric Card 3 -->
+                    <div class="glass-panel p-5 rounded-xl space-y-3 relative group transition hover:-translate-y-1">
+                        <div class="flex items-center justify-between text-slate-400">
+                            <span class="text-xs font-medium">Sprint Velocity</span>
+                            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-brand-cyan">
+                                <i data-lucide="zap" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline justify-between">
+                            <span class="text-2xl font-bold text-white">42 <span class="text-xs font-normal text-slate-400">pts</span></span>
+                            <span class="text-xs text-slate-400 flex items-center font-medium">
+                                <span>Steady</span>
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-brand-cyan h-full rounded-full" style="width: 60%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Metric Card 4 -->
+                    <div class="glass-panel p-5 rounded-xl space-y-3 relative group transition hover:-translate-y-1">
+                        <div class="flex items-center justify-between text-slate-400">
+                            <span class="text-xs font-medium">Flow State Efficiency</span>
+                            <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-brand-purple">
+                                <i data-lucide="activity" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline justify-between">
+                            <span class="text-2xl font-bold text-white">91.2%</span>
+                            <span class="text-xs text-brand-emerald flex items-center font-medium">
+                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 mr-0.5"></i> +4.5%
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-brand-purple h-full rounded-full" style="width: 91%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Split Content Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in-up delay-3">
+                    
+                    <!-- Main Activity Chart Card -->
+                    <div class="lg:col-span-2 glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-sm font-semibold text-slate-100">Productivity Analytics</h3>
+                                <p class="text-xs text-slate-400">Deep Work vs. Distractions across current week</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="flex items-center text-[10px] text-slate-400 gap-1">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-brand-indigo inline-block"></span> Deep Work
+                                </span>
+                                <span class="flex items-center text-[10px] text-slate-400 gap-1">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-slate-700 inline-block"></span> Overhead
+                                </span>
+                            </div>
+                        </div>
+                        <div class="h-64 w-full relative">
+                            <canvas id="overviewChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Compact Quick Tasks Mini Widget -->
+                    <div class="space-y-6">
+                        <!-- Quick Mini Focus Session Card -->
+                        <div class="glass-panel p-5 rounded-2xl border border-brand-indigo/30 bg-gradient-to-b from-slate-900/80 to-indigo-950/20">
+                            <div class="flex items-center justify-between text-xs text-slate-400 mb-3">
+                                <span class="font-medium text-slate-200">Active Focus Session</span>
+                                <span class="px-2 py-0.5 rounded bg-brand-indigo/20 text-brand-indigo font-mono text-[10px]">POMODORO</span>
+                            </div>
+                            <div class="text-center py-4">
+                                <div id="mini-timer-display" class="text-4xl font-extrabold font-mono text-white tracking-wider">25:00</div>
+                                <p class="text-[11px] text-slate-400 mt-1">Goal: Refactor API Endpoints</p>
+                            </div>
+                            <button id="mini-timer-btn" onclick="toggleTimer()" class="btn-hover-lift w-full py-2 rounded-lg bg-brand-indigo hover:bg-indigo-600 text-white text-xs font-semibold shadow-lg shadow-indigo-500/25">
+                                Start Session
+                            </button>
+                        </div>
+
+                        <!-- Quick Tasks Interactive Widget -->
+                        <div class="glass-panel p-5 rounded-2xl space-y-3">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-semibold text-slate-200 uppercase tracking-wider">Quick Tasks</h3>
+                                <span class="text-[10px] text-slate-500 font-mono">Persisted</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-900/80 rounded-lg p-1.5 border border-slate-800 focus-within:border-brand-indigo">
+                                <input type="text" id="overview-task-input" placeholder="+ Type task & hit enter..." onkeydown="handleOverviewQuickTask(event)" class="bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none w-full px-2 py-0.5">
+                            </div>
+                            <div class="space-y-2 pt-1" id="mini-tasks-container">
+                                <!-- Dynamic Mini Tasks -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VIEW 2: FOCUS TIMER VIEW (Pomodoro Focus Timer Card) -->
+            <div id="focus-view" class="view-section hidden space-y-8 animate-fade-in-up">
+                <div class="max-w-2xl mx-auto text-center space-y-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Pomodoro Focus Timer</h2>
+                        <p class="text-xs text-slate-400 mt-1">Eliminate distractions and maintain deep flow state focus.</p>
+                    </div>
+
+                    <!-- Main Timer Console Card -->
+                    <div class="glass-panel p-10 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden flex flex-col items-center">
+                        <!-- Mode Toggles -->
+                        <div class="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800 text-xs mb-8">
+                            <button onclick="setTimerMode('pomodoro')" id="mode-pomodoro" class="px-4 py-1.5 rounded-lg font-medium text-white bg-brand-indigo transition">Pomodoro (25m)</button>
+                            <button onclick="setTimerMode('short')" id="mode-short" class="px-4 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition">Short Break (5m)</button>
+                            <button onclick="setTimerMode('long')" id="mode-long" class="px-4 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white transition">Long Break (15m)</button>
+                        </div>
+
+                        <!-- Circular Progress Ring Visual with Hover Glow -->
+                        <div class="relative w-64 h-64 flex items-center justify-center my-4 group">
+                            <div class="absolute inset-0 bg-brand-indigo/10 rounded-full blur-xl group-hover:bg-brand-indigo/20 transition-all duration-500"></div>
+                            <svg class="w-full h-full transform -rotate-90 relative z-10">
+                                <circle cx="128" cy="128" r="110" stroke="currentColor" stroke-width="8" class="text-slate-800/80" fill="transparent" />
+                                <circle id="timer-progress" cx="128" cy="128" r="110" stroke="currentColor" stroke-width="8" class="text-brand-indigo transition-all duration-1000" fill="transparent" stroke-dasharray="691" stroke-dashoffset="0" stroke-linecap="round" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center z-20">
+                                <span id="main-timer-display" class="text-5xl font-mono font-bold text-white tracking-widest drop-shadow-md">25:00</span>
+                                <span id="timer-status-label" class="text-xs text-slate-400 mt-2 tracking-wide uppercase font-medium">Ready to Focus</span>
+                            </div>
+                        </div>
+
+                        <!-- Custom Hover-Animated Play/Pause/Reset Controls -->
+                        <div class="flex items-center gap-5 mt-6 relative z-10">
+                            <button onclick="resetTimer()" title="Reset Session" class="btn-hover-lift p-3.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 shadow-md">
+                                <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                            </button>
+                            <button id="main-timer-btn" onclick="toggleTimer()" class="btn-hover-lift px-8 py-3.5 rounded-full bg-gradient-to-r from-brand-indigo to-indigo-600 hover:from-indigo-500 hover:to-brand-indigo text-white font-semibold text-sm shadow-xl shadow-indigo-500/30 flex items-center gap-2">
+                                <i data-lucide="play" id="play-icon" class="w-4 h-4 fill-white"></i>
+                                <span id="main-timer-btn-text">Start Session</span>
+                            </button>
+                            <button onclick="skipTimer()" title="Skip Session" class="btn-hover-lift p-3.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 shadow-md">
+                                <i data-lucide="skip-forward" class="w-5 h-5"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Tilastot-osio -->
-        <section id="tilastot" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 rounded-3xl p-10 sm:p-14">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <!-- VIEW 3: QUICK TASKS VIEW -->
+            <div id="tasks-view" class="view-section hidden space-y-6 animate-fade-in-up">
+                <div class="flex items-center justify-between">
                     <div>
-                        <div class="text-4xl sm:text-5xl font-black text-amber-400 mb-2">100 %</div>
-                        <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Esimerkkiä</div>
+                        <h2 class="text-xl font-bold text-white">Quick Tasks & Checklist</h2>
+                        <p class="text-xs text-slate-400">Add tasks instantly, mark complete with fade animations, saved locally.</p>
                     </div>
-                    <div>
-                        <div class="text-4xl sm:text-5xl font-black text-white mb-2">2026</div>
-                        <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Vuosimalli</div>
+                    <button onclick="openAddTaskModal()" class="btn-hover-lift flex items-center gap-2 px-3.5 py-2 rounded-lg bg-brand-indigo hover:bg-indigo-600 text-white text-xs font-medium">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Add Task
+                    </button>
+                </div>
+
+                <!-- Quick Task Bar -->
+                <div class="glass-panel p-2 rounded-xl flex items-center gap-2 border border-slate-800 focus-within:border-brand-indigo/60 transition shadow-sm">
+                    <div class="pl-3 text-slate-500">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
                     </div>
-                    <div>
-                        <div class="text-4xl sm:text-5xl font-black text-indigo-400 mb-2">0 €</div>
-                        <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Oikea Hinta</div>
+                    <input type="text" id="quick-task-input" placeholder="Type a task and press Enter to quickly add..." onkeydown="handleQuickTaskSubmit(event)" class="bg-transparent border-none text-xs text-slate-200 placeholder-slate-500 focus:outline-none w-full py-1">
+                    <kbd class="px-2 py-1 text-[10px] bg-slate-900 rounded border border-slate-800 text-slate-400 font-mono">↵ Enter</kbd>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                    <div class="flex items-center gap-2">
+                        <button onclick="filterTasks('all')" class="task-filter-btn px-3 py-1 rounded-md text-xs font-medium bg-slate-800 text-white">All</button>
+                        <button onclick="filterTasks('pending')" class="task-filter-btn px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200">Pending</button>
+                        <button onclick="filterTasks('completed')" class="task-filter-btn px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200">Completed</button>
                     </div>
-                    <div>
-                        <div class="text-4xl sm:text-5xl font-black text-purple-400 mb-2">24/7</div>
-                        <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Näkyvillä</div>
+                    <span class="text-xs text-slate-500" id="task-stats-label">3 pending tasks</span>
+                </div>
+
+                <!-- Task List Container -->
+                <div id="tasks-list" class="space-y-3">
+                    <!-- Dynamic tasks rendered here -->
+                </div>
+            </div>
+
+            <!-- VIEW 4: ANALYTICS VIEW -->
+            <div id="analytics-view" class="view-section hidden space-y-8 animate-fade-in-up">
+                <div>
+                    <h2 class="text-xl font-bold text-white">Focus Analytics</h2>
+                    <p class="text-xs text-slate-400">Detailed metric overview of focus hours and project distribution.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Weekly Focus Distribution Chart -->
+                    <div class="glass-panel p-6 rounded-2xl">
+                        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center justify-between">
+                            <span>Focus Hours This Week</span>
+                            <span class="text-xs text-brand-emerald font-mono">+18% vs last week</span>
+                        </h3>
+                        <div class="h-64 relative">
+                            <canvas id="weeklyFocusChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Focus Distribution by Category -->
+                    <div class="glass-panel p-6 rounded-2xl">
+                        <h3 class="text-sm font-semibold text-slate-200 mb-4">Focus Time Distribution</h3>
+                        <div class="h-64 relative">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Tiimi-osio -->
-        <section id="tiimi" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-800/80">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Kuvitteellinen Tiimimme</h2>
-                <p class="text-slate-400 max-w-xl mx-auto">Esimerkkihenkilöt esimerkkiposteilla.</p>
-            </div>
-
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl flex items-center space-x-4">
-                    <div class="w-14 h-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-slate-300">
-                        EH
-                    </div>
-                    <div>
-                        <h4 class="text-white font-semibold">Esa Henkilö</h4>
-                        <p class="text-slate-400 text-sm">Toimitusjohtaja (Demo)</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl flex items-center space-x-4">
-                    <div class="w-14 h-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-slate-300">
-                        MN
-                    </div>
-                    <div>
-                        <h4 class="text-white font-semibold">Maija Mallikas</h4>
-                        <p class="text-slate-400 text-sm">Pääsuunnittelija (Demo)</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl flex items-center space-x-4">
-                    <div class="w-14 h-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-slate-300">
-                        TK
-                    </div>
-                    <div>
-                        <h4 class="text-white font-semibold">Teemu Kehittäjä</h4>
-                        <p class="text-slate-400 text-sm">Koodari (Demo)</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+        </div>
     </main>
 
-    <!-- Alatunniste -->
-    <footer class="border-t border-slate-800/80 bg-slate-950 py-12 text-center text-slate-500 text-sm">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-2">
-                <div class="w-6 h-6 rounded-md bg-amber-400 flex items-center justify-center text-slate-950 font-bold text-xs">E</div>
-                <span class="text-white font-semibold">Esimerkki Oy</span>
+    <!-- NEW TASK MODAL -->
+    <div id="task-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+        <div class="glass-panel w-full max-w-md p-6 rounded-2xl border border-slate-800 shadow-2xl relative space-y-4 animate-fade-in-up">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-white">Create New Task</h3>
+                <button onclick="closeAddTaskModal()" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
             </div>
-            <p>&copy; 2026 Esimerkki Oy. Tämä on pelkkä esimerkkisivusto.</p>
+            
+            <form id="task-form" onsubmit="handleAddTask(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Task Title</label>
+                    <input type="text" id="task-title-input" required placeholder="e.g. Design System Documentation" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-indigo">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Category</label>
+                    <select id="task-category-input" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-brand-indigo">
+                        <option value="Engineering">Engineering</option>
+                        <option value="Design">Design</option>
+                        <option value="Planning">Planning</option>
+                        <option value="Product">Product</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Priority</label>
+                    <select id="task-priority-input" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-brand-indigo">
+                        <option value="High">High Priority</option>
+                        <option value="Medium">Medium Priority</option>
+                        <option value="Low">Low Priority</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeAddTaskModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-medium hover:bg-slate-700 transition">Cancel</button>
+                    <button type="submit" class="btn-hover-lift px-4 py-1.5 rounded-lg bg-brand-indigo text-white text-xs font-medium shadow-lg shadow-indigo-500/20">Create Task</button>
+                </div>
+            </form>
         </div>
-    </footer>
+    </div>
 
+    <!-- COMMAND PALETTE MODAL -->
+    <div id="command-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-start justify-center z-50 pt-20 p-4">
+        <div class="glass-panel w-full max-w-lg rounded-2xl border border-slate-800 shadow-2xl overflow-hidden animate-fade-in-up">
+            <div class="p-3 border-b border-slate-800 flex items-center gap-3">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                <input type="text" placeholder="Type a command or search..." class="bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none w-full">
+            </div>
+            <div class="p-2 space-y-1">
+                <button onclick="setActiveNavById('focus-view')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 flex items-center justify-between text-xs text-slate-300">
+                    <span class="flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4 text-brand-indigo"></i> Start Focus Timer</span>
+                    <kbd class="text-[10px] text-slate-500 font-mono">⌘F</kbd>
+                </button>
+                <button onclick="openAddTaskModal()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 flex items-center justify-between text-xs text-slate-300">
+                    <span class="flex items-center gap-2"><i data-lucide="plus-circle" class="w-4 h-4 text-brand-emerald"></i> Add New Task</span>
+                    <kbd class="text-[10px] text-slate-500 font-mono">⌘N</kbd>
+                </button>
+                <button onclick="setActiveNavById('analytics-view')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/60 flex items-center justify-between text-xs text-slate-300">
+                    <span class="flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-brand-purple"></i> View Analytics</span>
+                    <kbd class="text-[10px] text-slate-500 font-mono">⌘A</kbd>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Local Storage tasks persistence
+        const DEFAULT_TASKS = [
+            { id: 1, title: "Refactor Authentication API Middleware", category: "Engineering", priority: "High", completed: false },
+            { id: 2, title: "Design High-Fidelity Figma Dark Theme Token System", category: "Design", priority: "Medium", completed: false },
+            { id: 3, title: "Audit Q4 Product Roadmap & Sprint Backlog", category: "Planning", priority: "Low", completed: true },
+            { id: 4, title: "Optimize Webpack bundle size & lazy loading", category: "Engineering", priority: "High", completed: false }
+        ];
+
+        let tasks = JSON.parse(localStorage.getItem('apex_tasks')) || DEFAULT_TASKS;
+
+        function saveTasks() {
+            localStorage.setItem('apex_tasks', JSON.stringify(tasks));
+        }
+
+        let timerMode = 'pomodoro'; 
+        let timerTimeLeft = 25 * 60;
+        let timerTotalTime = 25 * 60;
+        let timerInterval = null;
+        let isTimerRunning = false;
+
+        // Init App on load
+        window.onload = function() {
+            lucide.createIcons();
+            renderTasks();
+            initCharts();
+            updateDateDisplay();
+            
+            // Keybindings for Command Palette
+            window.addEventListener('keydown', (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    toggleQuickCommand();
+                }
+            });
+        };
+
+        // Theme Switcher Toggle
+        function toggleTheme() {
+            const htmlEl = document.documentElement;
+            const themeText = document.getElementById('theme-text');
+            const themeIcon = document.getElementById('theme-icon');
+
+            if (htmlEl.classList.contains('dark')) {
+                htmlEl.classList.remove('dark');
+                themeText.textContent = "Light Mode";
+                themeIcon.setAttribute('data-lucide', 'sun');
+            } else {
+                htmlEl.classList.add('dark');
+                themeText.textContent = "Dark Mode";
+                themeIcon.setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+        }
+
+        // Navigation Switcher
+        function setActiveNav(element, viewId) {
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'bg-brand-indigo/15', 'text-brand-indigo', 'border', 'border-brand-indigo/30');
+                el.classList.add('text-slate-400');
+            });
+            
+            element.classList.add('active', 'bg-brand-indigo/15', 'text-brand-indigo', 'border', 'border-brand-indigo/30');
+            element.classList.remove('text-slate-400');
+
+            document.querySelectorAll('.view-section').forEach(view => {
+                view.classList.add('hidden');
+            });
+
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function setActiveNavById(viewId) {
+            closeQuickCommand();
+            const navLink = document.querySelector(`a[href="#${viewId.replace('-view', '')}"]`);
+            if (navLink) setActiveNav(navLink, viewId);
+        }
+
+        // Date Display
+        function updateDateDisplay() {
+            const options = { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' };
+            const today = new Date();
+            document.getElementById('current-date').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        // Quick task submission from overview widget
+        function handleOverviewQuickTask(event) {
+            if (event.key === 'Enter') {
+                const input = document.getElementById('overview-task-input');
+                const title = input.value.trim();
+                if (title) {
+                    tasks.unshift({
+                        id: Date.now(),
+                        title,
+                        category: 'Quick Task',
+                        priority: 'Medium',
+                        completed: false
+                    });
+                    saveTasks();
+                    renderTasks();
+                    input.value = '';
+                }
+            }
+        }
+
+        // Quick inline task creation via Enter key
+        function handleQuickTaskSubmit(event) {
+            if (event.key === 'Enter') {
+                const input = document.getElementById('quick-task-input');
+                const title = input.value.trim();
+                if (title) {
+                    tasks.unshift({
+                        id: Date.now(),
+                        title,
+                        category: 'Quick Task',
+                        priority: 'Medium',
+                        completed: false
+                    });
+                    saveTasks();
+                    renderTasks();
+                    input.value = '';
+                }
+            }
+        }
+
+        // Task Render & Fade Out Animation Logic
+        function renderTasks(filter = 'all') {
+            const container = document.getElementById('tasks-list');
+            const miniContainer = document.getElementById('mini-tasks-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+            if (miniContainer) miniContainer.innerHTML = '';
+
+            let filteredTasks = tasks;
+            if (filter === 'pending') filteredTasks = tasks.filter(t => !t.completed);
+            if (filter === 'completed') filteredTasks = tasks.filter(t => t.completed);
+
+            const pendingCount = tasks.filter(t => !t.completed).length;
+            document.getElementById('pending-count').textContent = pendingCount;
+            document.getElementById('task-stats-label').textContent = `${pendingCount} pending tasks`;
+
+            filteredTasks.forEach(task => {
+                const priorityColors = {
+                    High: 'text-red-400 bg-red-400/10 border-red-500/20',
+                    Medium: 'text-amber-400 bg-amber-400/10 border-amber-500/20',
+                    Low: 'text-emerald-400 bg-emerald-400/10 border-emerald-500/20'
+                };
+
+                const cardHtml = `
+                    <div id="task-item-${task.id}" class="glass-panel p-4 rounded-xl flex items-center justify-between border border-slate-800 transition-all duration-300 ${task.completed ? 'opacity-50' : ''}">
+                        <div class="flex items-center gap-3">
+                            <button onclick="toggleTaskCompletion(${task.id})" class="w-5 h-5 rounded-md border ${task.completed ? 'bg-brand-emerald border-brand-emerald text-slate-950' : 'border-slate-700 bg-slate-900 hover:border-brand-indigo'} flex items-center justify-center transition">
+                                ${task.completed ? '<i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>' : ''}
+                            </button>
+                            <div>
+                                <p class="text-xs font-medium transition-all duration-300 ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}">${task.title}</p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[10px] text-slate-500">${task.category}</span>
+                                    <span class="text-[9px] px-1.5 py-0.2 rounded border ${priorityColors[task.priority] || priorityColors.Medium}">${task.priority}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="deleteTask(${task.id})" class="text-slate-600 hover:text-red-400 p-1 transition">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+
+            // Populate Overview Mini Tasks Stack
+            tasks.slice(0, 4).forEach(task => {
+                if (miniContainer) {
+                    miniContainer.innerHTML += `
+                        <div id="mini-task-${task.id}" class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800/80 hover:border-slate-700 transition">
+                            <div class="flex items-center gap-2.5 truncate">
+                                <button onclick="toggleTaskCompletion(${task.id})" class="w-4 h-4 rounded border ${task.completed ? 'bg-brand-emerald border-brand-emerald text-slate-950' : 'border-slate-700 bg-slate-900'} flex items-center justify-center text-[10px]">
+                                    ${task.completed ? '✓' : ''}
+                                </button>
+                                <span class="text-xs ${task.completed ? 'line-through text-slate-500' : 'text-slate-300'} truncate">${task.title}</span>
+                            </div>
+                            <span class="text-[10px] text-slate-500 font-mono">${task.category}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            lucide.createIcons();
+        }
+
+        // Toggle task completion with subtle smooth fade-out effect
+        function toggleTaskCompletion(id) {
+            const taskEl = document.getElementById(`task-item-${id}`);
+            const miniTaskEl = document.getElementById(`mini-task-${id}`);
+            
+            if (taskEl) taskEl.classList.add('task-fade-out');
+            if (miniTaskEl) miniTaskEl.classList.add('task-fade-out');
+
+            setTimeout(() => {
+                tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+                saveTasks();
+                renderTasks();
+            }, 300);
+        }
+
+        function deleteTask(id) {
+            const taskEl = document.getElementById(`task-item-${id}`);
+            if (taskEl) taskEl.classList.add('task-fade-out');
+            
+            setTimeout(() => {
+                tasks = tasks.filter(t => t.id !== id);
+                saveTasks();
+                renderTasks();
+            }, 300);
+        }
+
+        function filterTasks(filter) {
+            document.querySelectorAll('.task-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-white');
+                btn.classList.add('text-slate-400');
+            });
+            event.target.classList.add('bg-slate-800', 'text-white');
+            renderTasks(filter);
+        }
+
+        // Modal Controls
+        function openAddTaskModal() {
+            document.getElementById('task-modal').classList.remove('hidden');
+            document.getElementById('task-modal').classList.add('flex');
+        }
+
+        function closeAddTaskModal() {
+            document.getElementById('task-modal').classList.add('hidden');
+            document.getElementById('task-modal').classList.remove('flex');
+        }
+
+        function handleAddTask(e) {
+            e.preventDefault();
+            const title = document.getElementById('task-title-input').value;
+            const category = document.getElementById('task-category-input').value;
+            const priority = document.getElementById('task-priority-input').value;
+
+            tasks.unshift({
+                id: Date.now(),
+                title,
+                category,
+                priority,
+                completed: false
+            });
+
+            saveTasks();
+            renderTasks();
+            closeAddTaskModal();
+            document.getElementById('task-form').reset();
+        }
+
+        // Quick Command Modal
+        function toggleQuickCommand() {
+            const modal = document.getElementById('command-modal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                closeQuickCommand();
+            }
+        }
+
+        function closeQuickCommand() {
+            const modal = document.getElementById('command-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Timer Logic
+        function setTimerMode(mode) {
+            timerMode = mode;
+            if (mode === 'pomodoro') timerTotalTime = 25 * 60;
+            if (mode === 'short') timerTotalTime = 5 * 60;
+            if (mode === 'long') timerTotalTime = 15 * 60;
+
+            timerTimeLeft = timerTotalTime;
+            updateTimerDisplay();
+
+            ['pomodoro', 'short', 'long'].forEach(m => {
+                const btn = document.getElementById(`mode-${m}`);
+                if (m === mode) {
+                    btn.classList.add('bg-brand-indigo', 'text-white');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-brand-indigo', 'text-white');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+
+            if (isTimerRunning) {
+                pauseTimer();
+            }
+        }
+
+        function toggleTimer() {
+            if (isTimerRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            isTimerRunning = true;
+            document.getElementById('main-timer-btn-text').textContent = 'Pause Session';
+            document.getElementById('mini-timer-btn').textContent = 'Pause Session';
+            document.getElementById('timer-status-label').textContent = 'Focus Session Active';
+
+            const playIcon = document.getElementById('play-icon');
+            if (playIcon) playIcon.setAttribute('data-lucide', 'pause');
+            lucide.createIcons();
+
+            timerInterval = setInterval(() => {
+                if (timerTimeLeft > 0) {
+                    timerTimeLeft--;
+                    updateTimerDisplay();
+                } else {
+                    pauseTimer();
+                    alert("Focus session completed! Great work!");
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+            document.getElementById('main-timer-btn-text').textContent = 'Start Session';
+            document.getElementById('mini-timer-btn').textContent = 'Start Session';
+            document.getElementById('timer-status-label').textContent = 'Session Paused';
+
+            const playIcon = document.getElementById('play-icon');
+            if (playIcon) playIcon.setAttribute('data-lucide', 'play');
+            lucide.createIcons();
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerTimeLeft = timerTotalTime;
+            updateTimerDisplay();
+            document.getElementById('timer-status-label').textContent = 'Ready to Focus';
+        }
+
+        function skipTimer() {
+            resetTimer();
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timerTimeLeft / 60);
+            const seconds = timerTimeLeft % 60;
+            const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            document.getElementById('main-timer-display').textContent = formatted;
+            document.getElementById('mini-timer-display').textContent = formatted;
+
+            // Circular Progress Update
+            const circle = document.getElementById('timer-progress');
+            if (circle) {
+                const totalDash = 691;
+                const offset = totalDash - (timerTimeLeft / timerTotalTime) * totalDash;
+                circle.style.strokeDashoffset = offset;
+            }
+        }
+
+        // Chart Visualizations
+        function initCharts() {
+            // Overview Line Chart
+            const ctxOverview = document.getElementById('overviewChart').getContext('2d');
+            new Chart(ctxOverview, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [
+                        {
+                            label: 'Deep Work (hrs)',
+                            data: [4.2, 5.8, 6.5, 4.9, 7.1, 3.0, 5.4],
+                            borderColor: '#6366F1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Overhead (hrs)',
+                            data: [1.5, 2.0, 1.2, 2.5, 1.0, 0.5, 1.1],
+                            borderColor: '#334155',
+                            backgroundColor: 'transparent',
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748B', font: { size: 10 } } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748B', font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // Focus Hours Weekly Chart in Analytics View
+            const ctxWeekly = document.getElementById('weeklyFocusChart').getContext('2d');
+            new Chart(ctxWeekly, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Focus Hours',
+                        data: [6.5, 7.2, 5.8, 8.1, 6.9, 3.5, 5.4],
+                        backgroundColor: '#6366F1',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#64748B', font: { size: 10 } } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748B', font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // Category Doughnut Chart
+            const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+            new Chart(ctxCategory, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Engineering', 'Design', 'Product', 'Planning'],
+                    datasets: [{
+                        data: [45, 25, 15, 15],
+                        backgroundColor: ['#6366F1', '#10B981', '#06B6D4', '#8B5CF6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#94A3B8', font: { size: 11 } } }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+    </script>
 </body>
 </html>
